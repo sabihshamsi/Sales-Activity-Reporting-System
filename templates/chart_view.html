@@ -1,0 +1,419 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SSGC - Chart View</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            body {
+                background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .chart-container {
+                width: 100%;
+                max-width: 1400px;
+                background-color: white;
+                border-radius: 12px;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+                padding: 25px;
+                margin-top: 20px;
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #eaeaea;
+            }
+
+            .logo h1 {
+                color: #0054a6;
+                font-size: 28px;
+                font-weight: 700;
+                margin: 0;
+            }
+
+            .subtitle {
+                color: #6c757d;
+                font-size: 14px;
+                font-weight: 500;
+                margin: 0;
+            }
+
+            .header-info {
+                text-align: right;
+                font-size: 13px;
+                color: #6c757d;
+            }
+
+            .header-info strong {
+                color: #0054a6;
+            }
+
+            .chart-title {
+                color: #0054a6;
+                text-align: center;
+                margin-bottom: 25px;
+                font-weight: 600;
+                position: relative;
+                padding-bottom: 10px;
+            }
+
+            .chart-title:after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 80px;
+                height: 3px;
+                background: linear-gradient(90deg, #0054a6, #3a8de0);
+                border-radius: 3px;
+            }
+
+            .action-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .btn {
+                padding: 10px 18px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            }
+
+            .btn-primary {
+                background-color: #0054a6;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background-color: #00428a;
+            }
+
+            .btn-secondary {
+                background-color: #6c757d;
+                color: white;
+            }
+
+            .btn-secondary:hover {
+                background-color: #5a6268;
+            }
+
+            .btn-info {
+                background-color: #17a2b8;
+                color: white;
+            }
+
+            .btn-info:hover {
+                background-color: #138496;
+            }
+
+            .chart-controls {
+                background: linear-gradient(to right, #f8f9fa, #f0f3f5);
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 25px;
+                border: 1px solid #e2e8f0;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            }
+
+            .chart-controls h4 {
+                color: #0054a6;
+                margin-bottom: 18px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .chart-controls h4 i {
+                font-size: 20px;
+            }
+
+            .form-label {
+                font-weight: 500;
+                color: #495057;
+                margin-bottom: 8px;
+            }
+
+            .form-select {
+                border-radius: 8px;
+                padding: 10px;
+                border: 1px solid #ced4da;
+                transition: all 0.3s;
+            }
+
+            .form-select:focus {
+                border-color: #0054a6;
+                box-shadow: 0 0 0 0.25rem rgba(0, 84, 166, 0.25);
+            }
+
+            .chart-display {
+                text-align: center;
+                padding: 25px;
+                background-color: white;
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+                margin-bottom: 25px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            }
+
+            .metrics-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+                margin-top: 20px;
+            }
+
+            .metric-card {
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                padding: 20px;
+                background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+                transition: all 0.3s ease;
+            }
+
+            .metric-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .metric-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: #0054a6;
+                margin-bottom: 15px;
+                text-align: center;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #eaeaea;
+            }
+
+            .chart-img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+            }
+
+            .chart-img:hover {
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            }
+
+            .no-chart {
+                text-align: center;
+                padding: 50px;
+                color: #6c757d;
+                font-size: 18px;
+            }
+
+            .no-chart i {
+                font-size: 48px;
+                margin-bottom: 15px;
+                color: #ced4da;
+            }
+
+            .filters-summary {
+                background-color: #f8f9fa;
+                padding: 20px;
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+            }
+
+            .filters-summary h4 {
+                color: #0054a6;
+                margin-bottom: 15px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .filter-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .filter-tag {
+                background: linear-gradient(to right, #e3f2fd, #bbdefb);
+                color: #0054a6;
+                padding: 8px 15px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            @media (max-width: 992px) {
+                .metrics-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .header {
+                    flex-direction: column;
+                    text-align: center;
+                    gap: 15px;
+                }
+                
+                .header-info {
+                    text-align: center;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="chart-container">
+            <div class="header">
+                <div class="logo">
+                    <h1><i class="fas fa-fire"></i> SSGC</h1>
+                    <p class="subtitle">SUI SOUTHERN GAS COMPANY LIMITED</p>
+                </div>
+                <div class="header-info">
+                    <p><strong>Chart View</strong></p>
+                    <p>Generated: {{ current_time }}</p>
+                </div>
+            </div>
+
+            <h2 class="chart-title">FIELD ACTIVITY CHART VIEW</h2>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/summary_report" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Summary</a>
+                <a href="/report_results" class="btn btn-secondary"><i class="fas fa-list"></i> Detailed Report</a>
+                <button class="btn btn-info" onclick="window.print()"><i class="fas fa-print"></i> Print Chart</button>
+                <a href="/logout" class="btn btn-primary"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+
+            <!-- Chart Controls -->
+            <div class="chart-controls">
+                <h4><i class="fas fa-sliders-h"></i> Chart Options</h4>
+                <form method="get" class="row g-3 align-items-center">
+                    <div class="col-md-4">
+                        <label for="group_by" class="form-label">Group By:</label>
+                        <select name="group_by" id="group_by" class="form-select">
+                            <option value="Unit_Descr" {% if group_by=="Unit_Descr" %}selected{% endif %}>Unit</option>
+                            <option value="Region_Descr" {% if group_by=="Region_Descr" %}selected{% endif %}>Region</option>
+                            <option value="Zone_Descr" {% if group_by=="Zone_Descr" %}selected{% endif %}>Zone</option>
+                            <option value="SubZone_Descr" {% if group_by=="SubZone_Descr" %}selected{% endif %}>Sub Zone</option>
+                            <option value="Area_Descr" {% if group_by=="Area_Descr" %}selected{% endif %}>Area</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label for="chart_type" class="form-label">Chart Type:</label>
+                        <select name="chart_type" id="chart_type" class="form-select">
+                            <option value="bar" {% if chart_type=="bar" %}selected{% endif %}>Bar Chart</option>
+                            <option value="pie" {% if chart_type=="pie" %}selected{% endif %}>Pie Chart</option>
+                            <option value="line" {% if chart_type=="line" %}selected{% endif %}>Line Chart</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-sync-alt"></i> Update Charts</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Chart Display -->
+            <div class="chart-display">
+                {% if chart_data %}
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-title"><i class="fas fa-chart-bar"></i> Total Records</div>
+                            <img src="data:image/png;base64,{{ chart_data.Total_Records }}" alt="Total Records Chart" class="chart-img">
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-title"><i class="fas fa-money-bill-wave"></i> Gas Charges</div>
+                            <img src="data:image/png;base64,{{ chart_data.Total_Gas_Charges }}" alt="Gas Charges Chart" class="chart-img">
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-title"><i class="fas fa-file-invoice-dollar"></i> Net Bill</div>
+                            <img src="data:image/png;base64,{{ chart_data.Total_Net_Bill }}" alt="Net Bill Chart" class="chart-img">
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-title"><i class="fas fa-gas-pump"></i> SCM Consumed</div>
+                            <img src="data:image/png;base64,{{ chart_data.Total_SCM_Consumed }}" alt="SCM Consumed Chart" class="chart-img">
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="no-chart">
+                        <i class="fas fa-chart-pie"></i>
+                        <h3>No Chart Data Available</h3>
+                        <p>Please adjust your chart options or ensure you have data for the selected filters.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Filters Summary -->
+            <div class="filters-summary">
+                <h4><i class="fas fa-filter"></i> Applied Filters</h4>
+                <div class="filter-tags">
+                    {% if filters.billing_month %}
+                    <span class="filter-tag"><i class="fas fa-calendar-alt"></i> Billing Month: {{ filters.billing_month }}</span>
+                    {% endif %}
+                    {% if filters.cust_cl_cd %}
+                    <span class="filter-tag"><i class="fas fa-users"></i> Customer Class: {{ filters.cust_cl_cd }}</span>
+                    {% endif %}
+                    {% if filters.unit %}
+                    <span class="filter-tag"><i class="fas fa-building"></i> Unit: {{ filters.unit }}</span>
+                    {% endif %}
+                    {% if filters.region %}
+                    <span class="filter-tag"><i class="fas fa-map-marked"></i> Region: {{ filters.region }}</span>
+                    {% endif %}
+                    {% if filters.zone %}
+                    <span class="filter-tag"><i class="fas fa-map"></i> Zone: {{ filters.zone }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Set current time
+            document.addEventListener('DOMContentLoaded', function () {
+                const now = new Date();
+                document.querySelector('.header-info p:last-child').innerHTML = 
+                    '<strong>Generated:</strong> ' + now.toLocaleString();
+            });
+        </script>
+    </body>
+    </html>

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSGC - Generate Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .report-container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-info {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .report-title {
+            color: #0054a6;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .selection-pane {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-item label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+        }
+
+        .filter-item select,
+        .filter-item input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #0054a6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .info-panel {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="report-container">
+        <div class="header">
+            <div class="logo">
+                <h1>SSGC</h1>
+                <p class="subtitle">SUI SOUTHERN GAS COMPANY LIMITED</p>
+            </div>
+            <div class="header-info">
+                <p>Report Generation</p>
+            </div>
+        </div>
+
+        <h2 class="report-title">FIELD ACTIVITY REPORT </h2>
+
+        <div class="selection-pane">
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <label for="accountId">Account ID</label>
+                    <input type="text" id="accountId" placeholder="Enter Account ID">
+                </div>
+                <div class="filter-item">
+                    <label for="billingmonth">BILLING_MONTH</label>
+                    <select id="billingmonth">
+                        <option value="">Select Billing Month</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="cust-cl-cd">CUST_CL_CD</label>
+                    <select id="cust-cl-cd">
+                        <option value="">Select CUST_CL_CD</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="unit">Unit</label>
+                    <select id="unit">
+                        <option value="">Select Unit</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="region">Region</label>
+                    <select id="region">
+                        <option value="">Select Region</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="zone">Zone</label>
+                    <select id="zone">
+                        <option value="">Select Zone</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="subZone">Sub Zone</label>
+                    <select id="subZone">
+                        <option value="">Select Sub Zone</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="area">Area</label>
+                    <select id="area">
+                        <option value="">Select Area</option>
+                    </select>
+                </div>
+
+
+                <div class="action-buttons">
+
+                    <div>
+                        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                        <button class="btn btn-success" id="generateBtn">Generate Report</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3>Report Information</h3>
+                <p>Use the selection pane above to filter the field activity data. Select any combination of filters to
+                    generate a customized report.</p>
+            </div>
+
+            <div class="info-panel">
+                <h3>Ready to Generate Report</h3>
+                <p>Fill in the filters above and click "Generate Report" to view your results on a dedicated page.</p>
+            </div>
+        </div>
+
+        <script>
+            // DOM elements
+            const billingMonthSelect = document.getElementById('billingmonth');
+            const custClCdSelect = document.getElementById('cust-cl-cd');
+            const unitSelect = document.getElementById('unit');
+            const regionSelect = document.getElementById('region');
+            const zoneSelect = document.getElementById('zone');
+            const subZoneSelect = document.getElementById('subZone');
+            const areaSelect = document.getElementById('area');
+            const resetBtn = document.getElementById('resetBtn');
+            const generateBtn = document.getElementById('generateBtn');
+
+            // Load data on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log("Loading initial data...");
+                loadBillingMonths();
+                loadCustClasses();
+
+                // Disable geographic hierarchy initially
+                disableGeographicHierarchy();
+            });
+
+            // Event listeners for billing filters
+            billingMonthSelect.addEventListener('change', function () {
+                console.log("Billing month changed to:", this.value);
+                updateGeographicHierarchy();
+            });
+
+            custClCdSelect.addEventListener('change', function () {
+                console.log("Customer class changed to:", this.value);
+                updateGeographicHierarchy();
+            });
+
+            // Event listeners for hierarchical dropdowns
+            unitSelect.addEventListener('change', function () {
+                console.log("Unit changed to:", this.value);
+                loadRegions(this.value);
+                resetChildSelects(regionSelect);
+            });
+
+            regionSelect.addEventListener('change', function () {
+                console.log("Region changed to:", this.value);
+                if (this.value) {
+                    loadZones(this.value);
+                    resetChildSelects(zoneSelect);
+                } else {
+                    zoneSelect.innerHTML = '<option value="">Select Zone</option>';
+                    resetChildSelects(zoneSelect);
+                }
+            });
+
+            zoneSelect.addEventListener('change', function () {
+                console.log("Zone changed to:", this.value);
+                loadSubZones(this.value);
+                resetChildSelects(subZoneSelect);
+            });
+
+            subZoneSelect.addEventListener('change', function () {
+                console.log("SubZone changed to:", this.value);
+                loadAreas(this.value);
+            });
+
+            // Reset button
+            resetBtn.addEventListener('click', function () {
+                document.querySelectorAll('select, input').forEach(element => {
+                    element.value = '';
+                });
+
+                // Reset child selects after clearing
+                resetChildSelects(unitSelect);
+
+                // Reload billing months and cust classes
+                loadBillingMonths();
+                loadCustClasses();
+
+                // Disable geographic hierarchy
+                disableGeographicHierarchy();
+            });
+
+            // Generate report button
+            generateBtn.addEventListener('click', function () {
+                generateReport();
+            });
+
+
+
+            // Helper function to disable geographic hierarchy
+            function disableGeographicHierarchy() {
+                unitSelect.disabled = true;
+                regionSelect.disabled = true;
+                zoneSelect.disabled = true;
+                subZoneSelect.disabled = true;
+                areaSelect.disabled = true;
+
+                unitSelect.innerHTML = '<option value="">Select Unit</option>';
+                regionSelect.innerHTML = '<option value="">Select Region</option>';
+                zoneSelect.innerHTML = '<option value="">Select Zone</option>';
+                subZoneSelect.innerHTML = '<option value="">Select Sub Zone</option>';
+                areaSelect.innerHTML = '<option value="">Select Area</option>';
+            }
+
+            // Helper function to enable geographic hierarchy
+            function enableGeographicHierarchy() {
+                unitSelect.disabled = false;
+                regionSelect.disabled = false;
+                zoneSelect.disabled = false;
+                subZoneSelect.disabled = false;
+                areaSelect.disabled = false;
+            }
+
+            // Update geographic hierarchy based on billing selections
+            function updateGeographicHierarchy() {
+                const billingMonth = billingMonthSelect.value;
+                const custClCd = custClCdSelect.value;
+
+                // Enable geographic hierarchy if at least one filter is selected
+                if (billingMonth || custClCd) {
+                    console.log("At least one billing filter selected, loading units...");
+                    enableGeographicHierarchy();
+                    loadUnits(billingMonth, custClCd);
+                } else {
+                    console.log("No billing filters selected, disabling hierarchy");
+                    disableGeographicHierarchy();
+                }
+            }
+
+
+            // Helper function to reset child selects
+            function resetChildSelects(parentSelect) {
+                const children = {
+                    'unit': ['region', 'zone', 'subZone', 'area'],
+                    'region': ['zone', 'subZone', 'area'],
+                    'zone': ['subZone', 'area'],
+                    'subZone': ['area']
+                };
+
+                const parentId = parentSelect.id;
+                if (children[parentId]) {
+                    children[parentId].forEach(childId => {
+                        const select = document.getElementById(childId);
+                        const displayName = childId.charAt(0).toUpperCase() + childId.slice(1).replace(/([A-Z])/g, ' $1');
+                        select.innerHTML = '<option value="">Select ' + displayName + '</option>';
+                    });
+                }
+            }
+
+            // API functions
+            function loadBillingMonths() {
+                fetch('/get_billing_months')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Billing months data:", data);
+                        billingMonthSelect.innerHTML = '<option value="">Select Billing Month</option>';
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            billingMonthSelect.innerHTML += '<option value="" disabled>Error loading billing months</option>';
+                            return;
+                        }
+                        data.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.Billing_Month;
+                            option.textContent = item.Billing_Month;
+                            billingMonthSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading billing months:', error);
+                        billingMonthSelect.innerHTML = '<option value="">Error loading billing months</option>';
+                    });
+            }
+
+            function loadCustClasses() {
+                fetch('/get_cust_classes')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Customer classes data:", data);
+                        custClCdSelect.innerHTML = '<option value="">Select CUST_CL_CD</option>';
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            custClCdSelect.innerHTML += '<option value="" disabled>Error loading customer classes</option>';
+                            return;
+                        }
+                        data.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.Cust_Cl_Cd;
+                            option.textContent = item.Cust_Cl_Cd;
+                            custClCdSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading customer classes:', error);
+                        custClCdSelect.innerHTML = '<option value="">Error loading customer classes</option>';
+                    });
+            }
+
+            function loadUnits(billingMonth, custClCd) {
+                console.log("Loading units for billing month:", billingMonth, "and customer class:", custClCd);
+
+                // Build query parameters
+                let url = '/get_units?';
+                if (billingMonth) url += `billing_month=${billingMonth}&`;
+                if (custClCd) url += `cust_cl_cd=${custClCd}&`;
+
+                // Remove trailing & if present
+                url = url.replace(/&$/, '');
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Units data:", data);
+                        unitSelect.innerHTML = '<option value="">Select Unit</option>';
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            unitSelect.innerHTML += '<option value="" disabled>Error loading units</option>';
+                            return;
+                        }
+                        data.forEach(unit => {
+                            const option = document.createElement('option');
+                            option.value = unit.Unit_Cd;
+                            option.textContent = unit.Unit_Descr;
+                            unitSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading units:', error);
+                        unitSelect.innerHTML = '<option value="">Error loading units</option>';
+                    });
+            }
+
+
+            function loadRegions(unitCd) {
+                const billingMonth = billingMonthSelect.value;
+                const custClCd = custClCdSelect.value;
+
+                if (!unitCd) {
+                    regionSelect.innerHTML = '<option value="">Select Region</option>';
+                    return;
+                }
+
+                console.log("Loading regions for unit:", unitCd, "with billing:", billingMonth, "and customer class:", custClCd);
+
+                // Build query parameters
+                let url = `/get_regions?unit=${unitCd}`;
+                if (billingMonth) url += `&billing_month=${billingMonth}`;
+                if (custClCd) url += `&cust_cl_cd=${custClCd}`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Regions data:", data);
+                        regionSelect.innerHTML = '<option value="">Select Region</option>';
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            regionSelect.innerHTML += '<option value="" disabled>Error loading regions</option>';
+                            return;
+                        }
+                        data.forEach(region => {
+                            const option = document.createElement('option');
+                            option.value = region.Region_Cd;
+                            option.textContent = region.Region_Descr;
+                            regionSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading regions:', error);
+                        regionSelect.innerHTML = '<option value="">Error loading regions</option>';
+                    });
+            }
+            function loadZones(regionCd) {
+                const billingMonth = billingMonthSelect.value;
+                const custClCd = custClCdSelect.value;
+
+                if (!regionCd) {
+                    zoneSelect.innerHTML = '<option value="">Select Zone</option>';
+                    return;
+                }
+
+                console.log("Loading zones for region:", regionCd, "with billing:", billingMonth, "and customer class:", custClCd);
+
+                // Build query parameters
+                let url = `/get_zones?region=${regionCd}`;
+                if (billingMonth) url += `&billing_month=${billingMonth}`;
+                if (custClCd) url += `&cust_cl_cd=${custClCd}`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Zones data:", data);
+                        zoneSelect.innerHTML = '<option value="">Select Zone</option>';
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            zoneSelect.innerHTML += '<option value="" disabled>Error loading zones</option>';
+                            return;
+                        }
+                        if (data.length === 0) {
+                            zoneSelect.innerHTML = '<option value="">No zones available</option>';
+                            return;
+                        }
+                        data.forEach(zone => {
+                            const option = document.createElement('option');
+                            option.value = zone.Zone_Cd;
+                            option.textContent = zone.Zone_Descr;
+                            zoneSelect.appendChild(option);
+                        });
+                        console.log(`Loaded ${data.length} zones`);
+                    })
+                    .catch(error => {
+                        console.error('Error loading zones:', error);
+                        zoneSelect.innerHTML = '<option value="">Error loading zones</option>';
+                    });
+            }
+            function loadSubZones(zoneCd) {
+                const billingMonth = billingMonthSelect.value;
+                const custClCd = custClCdSelect.value;
+
+                if (!zoneCd) {
+                    subZoneSelect.innerHTML = '<option value="">Select Sub Zone</option>';
+                    return;
+                }
+
+                console.log("Loading subzones for zone:", zoneCd, "with billing:", billingMonth, "and customer class:", custClCd);
+
+                // Build query parameters
+                let url = `/get_subzones?zone=${zoneCd}`;
+                if (billingMonth) url += `&billing_month=${billingMonth}`;
+                if (custClCd) url += `&cust_cl_cd=${custClCd}`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Subzones data:", data);
+                        subZoneSelect.innerHTML = '<option value="">Select Sub Zone</option>';
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            subZoneSelect.innerHTML += '<option value="" disabled>Error loading subzones</option>';
+                            return;
+                        }
+                        data.forEach(subZone => {
+                            const option = document.createElement('option');
+                            option.value = subZone.SubZone_Cd;
+                            option.textContent = subZone.SubZone_Descr;
+                            subZoneSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading subzones:', error);
+                        subZoneSelect.innerHTML = '<option value="">Error loading subzones</option>';
+                    });
+            }
+            function loadAreas(subZoneCd) {
+                const billingMonth = billingMonthSelect.value;
+                const custClCd = custClCdSelect.value;
+
+                if (!subZoneCd) {
+                    areaSelect.innerHTML = '<option value="">Select Area</option>';
+                    return;
+                }
+
+                console.log("Loading areas for subzone:", subZoneCd, "with billing:", billingMonth, "and customer class:", custClCd);
+
+                // Build query parameters
+                let url = `/get_areas?subzone=${subZoneCd}`;
+                if (billingMonth) url += `&billing_month=${billingMonth}`;
+                if (custClCd) url += `&cust_cl_cd=${custClCd}`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Areas data:", data);
+                        areaSelect.innerHTML = '<option value="">Select Area</option>';
+                        if (data.error) {
+                            console.error('Error from server:', data.error);
+                            areaSelect.innerHTML += '<option value="" disabled>Error loading areas</option>';
+                            return;
+                        }
+                        data.forEach(area => {
+                            const option = document.createElement('option');
+                            option.value = area.Area_Cd;
+                            option.textContent = area.Area_Descr;
+                            areaSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading areas:', error);
+                        areaSelect.innerHTML = '<option value="">Error loading areas</option>';
+                    });
+            }
+
+            function generateReport() {
+                console.log("Generating report...");
+
+                // Log the current values for debugging
+                console.log("Current form values:", {
+                    'billing_month': billingMonthSelect.value,
+                    'cust_cl_cd': custClCdSelect.value,
+                    'account_id': document.getElementById('accountId').value,
+                    'unit': unitSelect.value,
+                    'region': regionSelect.value,
+                    'zone': zoneSelect.value,
+                    'subzone': subZoneSelect.value,
+                    'area': areaSelect.value,
+
+                });
+
+                // Create a form and submit it to redirect to results page
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/generate_report';
+
+                // Add form fields
+                const fields = {
+                    'billing_month': billingMonthSelect.value,
+                    'cust_cl_cd': custClCdSelect.value,
+                    'account_id': document.getElementById('accountId').value,
+                    'unit': unitSelect.value,
+                    'region': regionSelect.value,
+                    'zone': zoneSelect.value,
+                    'subzone': subZoneSelect.value,
+                    'area': areaSelect.value,
+                };
+
+                Object.entries(fields).forEach(([name, value]) => {
+                    if (value) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = name;
+                        input.value = value;
+                        form.appendChild(input);
+                    }
+                });
+
+                console.log("Form created, submitting...");
+
+                // Submit the form
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+
+        </script>
+</body>
+
+</html>

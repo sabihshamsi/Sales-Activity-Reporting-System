@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSGC - Summary Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .report-container {
+            width: 100%;
+            max-width: 1800px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-info {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .report-title {
+            color: #0054a6;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .filters-summary {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filters-summary h3 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-tag {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            border: 1px solid #dee2e6;
+        }
+
+        .summary-section {
+            margin-bottom: 30px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .summary-header {
+            background-color: #0054a6;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .summary-header.overall {
+            background-color: #28a745;
+        }
+
+        .summary-header.activity {
+            background-color: #17a2b8;
+        }
+
+        .summary-header.status {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 0;
+        }
+
+        .summary-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-item:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: #495057;
+            flex: 1;
+        }
+
+        .summary-value {
+            font-weight: bold;
+            color: #212529;
+            text-align: right;
+            min-width: 120px;
+        }
+
+        .summary-value.currency {
+            color: #28a745;
+        }
+
+        .summary-value.count {
+            color: #0054a6;
+        }
+
+        .summary-value.consumation {
+            color: #17a2b8;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: #0054a6;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 18px;
+        }
+
+        .chart-controls {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chart-controls label {
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+
+        .chart-controls select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .report-container {
+                box-shadow: none;
+            }
+
+            .action-buttons,
+            .filters-summary,
+            .chart-controls {
+                display: none;
+            }
+
+            .summary-header {
+                background: #0054a6 !important;
+            }
+        }
+
+        /* Hide columns based on group selection */
+        .hide-unit .unit-col {
+            display: none;
+        }
+
+        .hide-region .region-col {
+            display: none;
+        }
+
+        .hide-zone .zone-col {
+            display: none;
+        }
+
+        .hide-subzone .subzone-col {
+            display: none;
+        }
+
+        .hide-area .area-col {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="report-container">
+        <div class="header">
+            <div class="logo">
+                <h1>SSGC</h1>
+                <p class="subtitle">SUI SOUTHERN GAS COMPANY LIMITED</p>
+            </div>
+            <div class="header-info">
+                <p>Summary Report</p>
+                <p id="generatedTime">Generated: Loading...</p>
+            </div>
+        </div>
+
+        <h2 class="report-title">FIELD ACTIVITY COMPREHENSIVE SUMMARY REPORT</h2>
+
+        <!-- Action Buttons at the Top -->
+        <div class="action-buttons">
+            <div>
+                <a href="/chart_view" class="btn btn-info">View Chart</a>
+                <a href="/report_results" class="btn btn-secondary">← Back to Detailed Report</a>
+                <a href="/gen_report" class="btn btn-secondary">← Back to Report Generator</a>
+            </div>
+            <div class="export-options">
+                <button class="btn btn-info" onclick="window.print()">Print Report</button>
+                <button class="btn btn-success" onclick="exportToCSV()">Export to CSV</button>
+                <a href="/logout" class="btn btn-primary">Logout</a>
+            </div>
+        </div>
+
+        <!-- Filters Summary -->
+        <div class="filters-summary">
+            <h3>Applied Filters</h3>
+            <div class="filter-tags">
+                {% if filters.billing_month %}
+                <span class="filter-tag">Billing Month: {{ filters.billing_month }}</span>
+                {% endif %}
+                {% if filters.cust_cl_cd %}
+                <span class="filter-tag">Customer Class: {{ filters.cust_cl_cd }}</span>
+                {% endif %}
+                {% if filters.account_id %}
+                <span class="filter-tag">Account ID: {{ filters.account_id }}</span>
+                {% endif %}
+                {% if filters.unit %}
+                <span class="filter-tag">Unit: {{ filters.unit }}</span>
+                {% endif %}
+                {% if filters.region %}
+                <span class="filter-tag">Region: {{ filters.region }}</span>
+                {% endif %}
+                {% if filters.zone %}
+                <span class="filter-tag">Zone: {{ filters.zone }}</span>
+                {% endif %}
+                {% if filters.subzone %}
+                <span class="filter-tag">Sub Zone: {{ filters.subzone }}</span>
+                {% endif %}
+                {% if filters.area %}
+                <span class="filter-tag">Area: {{ filters.area }}</span>
+                {% endif %}
+                {% if filters.activity_type %}
+                <span class="filter-tag">Activity Type: {{ filters.activity_type }}</span>
+                {% endif %}
+                {% if filters.fa_status %}
+                <span class="filter-tag">FA Status: {{ filters.fa_status }}</span>
+                {% endif %}
+                {% if filters.date_from %}
+                <span class="filter-tag">From: {{ filters.date_from }}</span>
+                {% endif %}
+                {% if filters.date_to %}
+                <span class="filter-tag">To: {{ filters.date_to }}</span>
+                {% endif %}
+                {% if not filters.billing_month and not filters.cust_cl_cd and not filters.account_id and not
+                filters.unit and not filters.region and not filters.zone and not filters.subzone and not filters.area
+                and not filters.activity_type and not filters.fa_status and not filters.date_from and not
+                filters.date_to %}
+                <span class="filter-tag">No filters applied (showing all records)</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Group By Controls -->
+        <div class="chart-controls">
+            <label for="groupBy">Group By:</label>
+            <select id="groupBy" onchange="updateGrouping()">
+                <option value="Unit_Descr" {% if group_by=='Unit_Descr' %}selected{% endif %}>Unit</option>
+                <option value="Region_Descr" {% if group_by=='Region_Descr' %}selected{% endif %}>Region</option>
+                <option value="Zone_Descr" {% if group_by=='Zone_Descr' %}selected{% endif %}>Zone</option>
+                <option value="SubZone_Descr" {% if group_by=='SubZone_Descr' %}selected{% endif %}>Sub Zone</option>
+                <option value="Area_Descr" {% if group_by=='Area_Descr' %}selected{% endif %}>Area</option>
+            </select>
+        </div>
+
+        <!-- Summary Results -->
+        {% if summary_results %}
+        <div class="table-responsive" id="summaryTable">
+            <table class="table table-bordered table-striped">
+                <thead class="table-primary">
+                    <tr>
+                        <th class="unit-col">Unit</th>
+                        <th class="region-col">Region</th>
+                        <th class="zone-col">Zone</th>
+                        <th class="subzone-col">Sub Zone</th>
+                        <th class="area-col">Area</th>
+                        <th>Total Unique Accounts</th>
+                        <th>Total Gas Charges</th>
+                        <th>Avg Gas Charges</th>
+                        <th>Total Net Bill</th>
+                        <th>Avg Net Bill</th>
+                        <th>Total Meter Rent</th>
+                        <th>Total GST</th>
+                        <th>Total Arrears</th>
+                        <th>Total Last Payments</th>
+                        <th>Total SCM</th>
+                        <th>Avg SCM</th>
+                        <th>Total MMBTU</th>
+                        <th>Avg MMBTU</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in summary_results %}
+                    <tr>
+                        <td class="unit-col">{{ item.Unit_Descr or 'N/A' }}</td>
+                        <td class="region-col">{{ item.Region_Descr or 'N/A' }}</td>
+                        <td class="zone-col">{{ item.Zone_Descr or 'N/A' }}</td>
+                        <td class="subzone-col">{{ item.SubZone_Descr or 'N/A' }}</td>
+                        <td class="area-col">{{ item.Area_Descr or 'N/A' }}</td>
+                        <td>{{ item.Total_Records | format_number }}</td>
+                        <td>{{ item.Total_Gas_Charges | format_currency }}</td>
+                        <td>{{ item.Avg_Gas_Charges | format_currency }}</td>
+                        <td>{{ item.Total_Net_Bill | format_currency }}</td>
+                        <td>{{ item.Avg_Net_Bill | format_currency }}</td>
+                        <td>{{ item.Total_Meter_Rent | format_currency }}</td>
+                        <td>{{ item.Total_GST | format_currency }}</td>
+                        <td>{{ item.Total_Arrears | format_currency }}</td>
+                        <td>{{ item.Total_Last_Payments | format_currency }}</td>
+                        <td>{{ item.Total_SCM_Consumed | format_number }}</td>
+                        <td>{{ item.Avg_SCM_Per_Account | format_decimal }}</td>
+                        <td>{{ item.Total_MMBTU_Consumed | format_decimal }}</td>
+                        <td>{{ item.Avg_MMBTU_Per_Account | format_decimal }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-results">
+            <h3>No Summary Results Found</h3>
+            <p>No summary data available for the selected criteria.</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <script>
+        // Set current time for the report
+        document.addEventListener('DOMContentLoaded', function () {
+            const now = new Date();
+            document.getElementById('generatedTime').textContent = 'Generated: ' + now.toLocaleString();
+
+            // Apply column hiding based on current group selection
+            updateColumnVisibility();
+        });
+
+        function exportToCSV() {
+            // CSV export functionality would go here
+            alert('CSV export functionality would be implemented here');
+        }
+
+        function updateGrouping() {
+            const groupBy = document.getElementById('groupBy').value;
+            // Get current URL and parameters
+            const url = new URL(window.location.href);
+
+            // Update or add the group_by parameter
+            url.searchParams.set('group_by', groupBy);
+
+            // Reload the page with the new parameter
+            window.location.href = url.toString();
+        }
+
+        function updateColumnVisibility() {
+            const groupBy = document.getElementById('groupBy').value;
+            const tableContainer = document.getElementById('summaryTable');
+
+            // Reset all hiding classes
+            tableContainer.classList.remove('hide-unit', 'hide-region', 'hide-zone', 'hide-subzone', 'hide-area');
+
+            // Apply hiding based on selected group
+            switch (groupBy) {
+                case 'Unit_Descr':
+                    tableContainer.classList.add('hide-region', 'hide-zone', 'hide-subzone', 'hide-area');
+                    break;
+                case 'Region_Descr':
+                    tableContainer.classList.add('hide-zone', 'hide-subzone', 'hide-area');
+                    break;
+                case 'Zone_Descr':
+                    tableContainer.classList.add('hide-subzone', 'hide-area');
+                    break;
+                case 'SubZone_Descr':
+                    tableContainer.classList.add('hide-area');
+                    break;
+                // Area_Descr shows all columns
+            }
+        }
+    </script>
+</body>
+
+</html>
